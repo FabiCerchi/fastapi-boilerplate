@@ -1,0 +1,14 @@
+fastapi
+pydantic[email]
+uvicorn
+psycopg2
+SQLAlchemy
+python-dotenv
+alembic
+passlib[bcrypt]
+bcrypt == 3.2.2
+python-jose[cryptography]
+python-multipart
+pytest
+httpx
+coverage
