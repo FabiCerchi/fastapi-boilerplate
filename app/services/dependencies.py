@@ -1,7 +1,7 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
+from app.db.database import get_db
 from app.repositories.user_respository import UserRepository
 from app.repositories.auth_repository import AuthRepository
 from app.services.user_service import UserService

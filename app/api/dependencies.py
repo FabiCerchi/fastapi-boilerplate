@@ -14,7 +14,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     """
     Función que inyecta la dependencia para los endpoints.
     """
-    print('Current Token:', token)
     try:
         return oauth_service.get_current_user(token)
     except Exception as e:
