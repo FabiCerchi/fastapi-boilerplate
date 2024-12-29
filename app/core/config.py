@@ -20,6 +20,8 @@ class Settings:
         f'{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+    SECRET_KEY: str = os.getenv('SECRET_KEY')
+    ALGORITHM: str = os.getenv('ALGORITHM')
 
     def __str__(self):
         return (

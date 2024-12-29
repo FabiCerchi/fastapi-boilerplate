@@ -2,12 +2,12 @@ from fastapi import HTTPException, status
 from abc import abstractmethod
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import Optional, Type
 
-from app.models.schemas.user import UserCreate, UserUpdate
-from app.repositories.irepository import IRepository
-from app.models.orm.user import User
-from app.core.hashing import Hasher
+from app.schemas.user import UserCreate, UserUpdate
+from app.repositories.base_repository import IRepository
+from app.models.user import User
+from app.utils.hashing import Hasher
 
 
 class IUserRepository(IRepository):
@@ -30,8 +30,9 @@ class UserRepository(IUserRepository):
     def get(self, user_id: int) -> Optional[User]:
         pass
 
-    def get_all(self) -> List[User]:
-        pass
+    def get_all(self) -> list[Type[User]]:
+        users = self.db.query(User).all()
+        return users
 
     def add(self, user: UserCreate) -> User:
         try:

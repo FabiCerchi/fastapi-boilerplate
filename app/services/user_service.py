@@ -1,4 +1,4 @@
-from app.models.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse
 from app.repositories.user_respository import IUserRepository
 
 class UserService:
@@ -20,3 +20,11 @@ class UserService:
         """
         new_user = self.user_repository.add(user)
         return new_user
+
+    def get_users(self) -> list[UserResponse]:
+        """
+        Method to get all users
+        :return: list[UserResponse]
+        """
+        users = self.user_repository.get_all()
+        return users
