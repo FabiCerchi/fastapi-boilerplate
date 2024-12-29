@@ -9,5 +9,4 @@ class OAuth:
         Valida el token y devuelve los datos del usuario.
         """
         credentials_exception = Exception("Could not validate credentials")
-        print('Token:', token)
         return self.token.verify_token(token, credentials_exception)
