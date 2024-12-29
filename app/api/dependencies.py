@@ -1,8 +1,14 @@
 from fastapi import Depends, HTTPException, status
+from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 
 from app.utils.oauth import OAuth
 from app.utils.token import Token
+from app.db.database import get_db
+from app.repositories.user_respository import UserRepository
+from app.repositories.auth_repository import AuthRepository
+from app.services.user_service import UserService
+from app.services.auth_service import AuthService
 
 # Instancia global para extraer tokens
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -22,3 +28,21 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+def get_user_service(db: Session = Depends(get_db)) -> UserService:
+    """
+    Function to get user service
+    :param db:
+    :param UserService:
+    """
+    repo = UserRepository(db)
+    return UserService(repo)
+
+def get_auth_service(db: Session = Depends(get_db)) -> AuthService:
+    """
+    Function to get auth service
+    :param db:
+    :param AuthService:
+    """
+    repo = AuthRepository(db)
+    return AuthService(repo)

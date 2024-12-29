@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, status
 from app.schemas.token import TokenData
 from app.schemas.user import UserCreate, UserResponse
 from app.services.user_service import UserService
-from app.services.dependencies import get_user_service
+from app.api.dependencies import get_user_service
 from app.api.dependencies import get_current_user
 
 user_router = APIRouter(prefix='/users', tags=['Users'])
