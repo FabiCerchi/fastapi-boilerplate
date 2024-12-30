@@ -88,16 +88,23 @@ class UserRepository(IUserRepository):
         :param user: UserUpdate
         :return: User
         """
+        user = user.model_dump(exclude_unset=True)
+        if not user:
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = "No fields to update"
+            )
+
         user_to_update = self.db.query(User).filter(User.id == user_id).first()
         if not user_to_update:
             raise HTTPException(
                 status_code = status.HTTP_404_NOT_FOUND,
                 detail = f"User with id {user_id} not found"
             )
+
         try:
-            user_to_update.email = user.email
-            user_to_update.username = user.username
-            user_to_update.address = user.address
+            for key, value in user.items():
+                setattr(user_to_update, key, value)
             self.db.commit()
             self.db.refresh(user_to_update)
         except Exception as e:
