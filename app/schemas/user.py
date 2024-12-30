@@ -2,7 +2,7 @@
 This module contains the Pydantic models for the User model.
 """
 from typing import Optional
-from pydantic import BaseModel, EmailStr , ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict, Field, validator, field_validator
 
 
 class UserCreate(BaseModel):
@@ -22,7 +22,8 @@ class UserResponse(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
-    address: Optional[str] = None
-    password: Optional[str] = None
+    username: Optional[str] = Field(None, min_length=3, max_length=24)
+    password: Optional[str] = Field(None, min_length=8, max_length=64)
+    email: Optional[EmailStr] = Field(None, max_length=50)
+    address: Optional[str] = Field(None, max_length=255)
+
