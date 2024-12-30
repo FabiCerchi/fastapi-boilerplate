@@ -1,3 +1,6 @@
+"""
+This module contains the endpoints for the authentication
+"""
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -10,7 +13,10 @@ auth_router = APIRouter(prefix='/auth', tags=['Auth'])
 @auth_router.post('/login',
                   status_code=status.HTTP_200_OK,
                   response_model=TokenResponse)
-async def get_login(login: OAuth2PasswordRequestForm = Depends(), auth_service: AuthService = Depends(get_auth_service)):
+async def get_login(
+        login: OAuth2PasswordRequestForm = Depends(),
+        auth_service: AuthService = Depends(get_auth_service)
+):
     """
     Get a token
     :param login:

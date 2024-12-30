@@ -1,6 +1,10 @@
+"""
+This module contains the dependencies for the API.
+"""
 from fastapi import Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
+
 
 from app.utils.oauth import OAuth
 from app.utils.token import Token

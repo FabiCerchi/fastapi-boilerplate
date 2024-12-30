@@ -1,5 +1,7 @@
+"""
+This module contains the repository class for the authentication feature.
+"""
 from fastapi import HTTPException, status
-
 from sqlalchemy.orm import Session
 
 from app.schemas.auth import Login
@@ -8,7 +10,9 @@ from app.utils.hashing import Hasher
 from app.utils.token import Token
 
 class AuthRepository:
-
+    """
+    Auth repository class
+    """
     def __init__(self, db: Session):
         self.db = db
 

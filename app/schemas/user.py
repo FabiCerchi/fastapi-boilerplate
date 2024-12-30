@@ -1,3 +1,6 @@
+"""
+This module contains the Pydantic models for the User model.
+"""
 from typing import Optional
 from pydantic import BaseModel, EmailStr
 

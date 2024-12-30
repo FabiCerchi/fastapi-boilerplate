@@ -1,4 +1,6 @@
-# OAuth class proteje las rutas de la aplicación
+"""
+Oauth module
+"""
 
 class OAuth:
     def __init__(self, token):
@@ -6,7 +8,9 @@ class OAuth:
 
     def get_current_user(self, token: str) -> dict:
         """
-        Valida el token y devuelve los datos del usuario.
+        Get current user
+        :param token: str
+        :return: dict
         """
         credentials_exception = Exception("Could not validate credentials")
         return self.token.verify_token(token, credentials_exception)

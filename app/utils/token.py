@@ -1,5 +1,9 @@
-from jose import jwt, JWTError
+"""
+Token utility
+"""
 from datetime import datetime, timedelta, timezone
+from jose import jwt, JWTError
+
 
 from app.core.config import settings
 from app.schemas.token import TokenData
@@ -7,7 +11,9 @@ from app.schemas.token import TokenData
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 class Token:
-
+    """
+    Token utility class
+    """
     @staticmethod
     def generate_token(data: dict) -> str:
         """
