@@ -53,7 +53,7 @@ class UserService:
         """
         return self.user_repository.delete(user_id)
 
-    def update_user(self, user_id: int, user: UserUpdate) -> UserResponse:
+    def update_user(self, user_id: int, user: dict) -> UserResponse:
         """
         Method to update a user
         :param user_id: int
