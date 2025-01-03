@@ -46,6 +46,11 @@ async def create_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+    except RepositoryError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
 
     return new_user
 

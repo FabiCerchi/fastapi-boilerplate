@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import Optional, Type
 
+from app.core.exceptions import RepositoryError
 from app.schemas.user import UserCreate, UserUpdate
 from app.repositories.base_repository import IRepository
 from app.models.user import User
@@ -80,10 +81,7 @@ class UserRepository(IUserRepository):
             self.db.refresh(new_user)
         except Exception as e:
             self.db.rollback()
-            raise HTTPException(
-                status_code = status.HTTP_409_CONFLICT,
-                detail = f"Failed to create user: {e}"
-            )
+            raise RepositoryError(f"Failed to create user: {e}")
         return new_user
 
     def update(self, user_id: int, user: UserUpdate) -> User:
