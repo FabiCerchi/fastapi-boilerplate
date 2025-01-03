@@ -1,25 +1,59 @@
-from fastapi.testclient import TestClient
-import sys
-import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from main import app
-from app.db.database import Base, get_db
+USER = {
+    "email": "fabian@prueba.com",
+    "username": "fabianusername",
+    "password": "fabianpassword",
+    "address": "fabian address"
+}
 
-# Create a test database
-db_path = os.path.join(os.path.dirname(__file__), 'test.db')
-SQL_ALCHEMY_DATABASE_URL = f"sqlite:///{db_path}"
-engine = create_engine(SQL_ALCHEMY_DATABASE_URL)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+class TestUserAPI:
 
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
-app.dependency_overrides[get_db] = override_get_db
+    def test_create_user(self, test_client):
+        response = test_client.post("/users/", json=USER)
+        assert response.status_code == 201, f"Error: {response.json()}"
+        assert response.json()['username'] == USER['username']
 
-client = TestClient(app)
+
+    def test_duplicated_user(self, test_client):
+        test_client.post("/users/", json=USER)
+        create_response = test_client.post("/users/", json=USER)
+        assert create_response.status_code == 409, f"Error: {create_response.json()}"
+
+
+    def test_get_users(self, auth_token, test_client):
+        get_users_response = test_client.get("/users/", headers={"Authorization": f"Bearer {auth_token}"})
+        assert get_users_response.status_code == 200, f"Error: {get_users_response.json()}"
+        assert isinstance(get_users_response.json(), list)
+
+
+    def test_get_user_by_id(self, test_client):
+        new_user = test_client.post("/users/", json=USER)
+        user_id = new_user.json()['id']
+        res = test_client.post("/auth/login", data={"username": USER['username'], "password": USER['password']})
+        jwt = res.json()['access_token']
+        response = test_client.get(f"/users/{user_id}", headers={"Authorization": f"Bearer {jwt}"})
+        response.json()
+        assert response.status_code == 200, f"Error: {response.json()}"
+        assert response.json()['id'] == user_id
+
+
+    def test_delete_user(self, test_client):
+        new_user = test_client.post("/users/", json=USER)
+        user_id = new_user.json()['id']
+        res = test_client.post("/auth/login", data={"username": USER['username'], "password": USER['password']})
+        jwt = res.json()['access_token']
+        response = test_client.delete(f"/users/{user_id}", headers={"Authorization": f"Bearer {jwt}"})
+        assert response.status_code == 204, f"Error: {response.json()}"
+        assert response.text == ""
+
+
+    def test_update_user(self, test_client):
+        new_user = test_client.post("/users/", json=USER)
+        user_id = new_user.json()['id']
+        res = test_client.post("/auth/login", data={"username": USER['username'], "password": USER['password']})
+        jwt = res.json()['access_token']
+        response = test_client.put(f"/users/{user_id}", json={"username": "asd"}, headers={"Authorization": f"Bearer {jwt}"})
+        assert response.status_code == 200, f"Error: {response.json()}"
+        response = test_client.get(f"/users/{user_id}", headers={"Authorization": f"Bearer {jwt}"})
+        assert response.json()['username'] == "asd"
+        assert response.json()['address'] == "fabian address"
