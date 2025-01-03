@@ -6,7 +6,7 @@ from typing import Optional
 from pydantic import EmailStr
 
 from app.core.exceptions import ItemIdNotFoundError, ItemEmailNotFoundError
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse, UserUpdate
 from app.repositories.user_respository import IUserRepository
 
 
@@ -27,6 +27,8 @@ class UserService:
         :param user: UserCreate
         :return: UserResponse
         """
+        # Check if user with email already exists
+        # Check if user with username already exists
         new_user = self.user_repository.add(user)
         return new_user
 
@@ -35,6 +37,7 @@ class UserService:
         Method to get all users
         :return: list[UserResponse]
         """
+        # Check if exist users
         users = self.user_repository.get_all()
         return users
 
@@ -56,16 +59,16 @@ class UserService:
         :param user_id: int
         :return: bool
         """
+        # Check if user exists
         return self.user_repository.delete(user_id)
 
-    def update_user(self, user_id: int, user: dict) -> UserResponse:
+    def update_user(self, user_id: int, user: UserUpdate) -> UserResponse:
         """
         Method to update a user
         :param user_id: int
         :param user: UserUpdate
         :return: UserResponse
         """
-
         exist  = self.user_repository.get(user_id)
         if not exist:
             raise ItemIdNotFoundError('user', user_id)
