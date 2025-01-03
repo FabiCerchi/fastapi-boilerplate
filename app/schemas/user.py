@@ -6,9 +6,9 @@ from pydantic import BaseModel, EmailStr, ConfigDict, Field, validator, field_va
 
 
 class UserCreate(BaseModel):
-    username: str
+    username: str = Field(..., min_length=4, max_length=24)
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8, max_length=64)
     address: Optional[str] = None
 
 

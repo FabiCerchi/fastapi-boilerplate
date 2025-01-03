@@ -29,12 +29,6 @@ class UserService:
         :return: UserResponse
         """
 
-        if not user.username or len(user.username) < 4:
-            raise ValueError("Username must be at least 4 characters")
-
-        if not user.password or len(user.password) < 8:
-            raise ValueError("Password must be at least 8 characters")
-
         existing_user = self.get_user_by_username_or_email(user.username, user.email)
         if existing_user:
             if existing_user.email == user.email:
