@@ -5,8 +5,10 @@ from typing import Optional
 
 from pydantic import EmailStr
 
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.core.exceptions import ItemIdNotFoundError, ItemEmailNotFoundError
+from app.schemas.user import UserCreate, UserResponse
 from app.repositories.user_respository import IUserRepository
+
 
 class UserService:
     """
@@ -43,6 +45,9 @@ class UserService:
         :return: UserResponse
         """
         user = self.user_repository.get(user_id)
+        if user is None:
+            raise ItemIdNotFoundError('user', user_id)
+
         return user
 
     def delete_user(self, user_id: int) -> bool:
@@ -60,7 +65,16 @@ class UserService:
         :param user: UserUpdate
         :return: UserResponse
         """
-        updated_user = self.user_repository.update(user_id, user)
+
+        exist  = self.user_repository.get(user_id)
+        if not exist:
+            raise ItemIdNotFoundError('user', user_id)
+
+        try:
+            updated_user = self.user_repository.update(user_id, user)
+        except Exception as e:
+            raise Exception(f"Failed to update user: {e}")
+
         return updated_user
 
     def get_user_by_email(self, email: EmailStr) -> Optional[UserResponse]:
@@ -70,4 +84,6 @@ class UserService:
         :return: UserResponse
         """
         user = self.user_repository.get_user_by_email(email)
+        if not user:
+            raise ItemEmailNotFoundError('user', email)
         return user

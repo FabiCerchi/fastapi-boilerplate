@@ -1,6 +1,7 @@
 """
 This module contains the user repository class and interface
 """
+
 from abc import abstractmethod
 from fastapi import HTTPException, status
 from pydantic import EmailStr
@@ -35,19 +36,13 @@ class UserRepository(IUserRepository):
     def __init__(self, db: Session):
         self.db = db
 
-    def get(self, user_id: int) -> User:
+    def get(self, user_id: int) -> Optional[User]:
         """
         Method to get a user by id
         :param user_id: int
         :return: User
         """
-        user = self.db.query(User).filter(User.id == user_id).first()
-        if not user:
-            raise HTTPException(
-                status_code = status.HTTP_404_NOT_FOUND,
-                detail = f"User with id {user_id} not found"
-            )
-        return user
+        return self.db.query(User).filter(User.id == user_id).first()
 
     def get_all(self) -> list[Type[User]]:
         """
@@ -88,12 +83,6 @@ class UserRepository(IUserRepository):
         :param user: UserUpdate
         :return: User
         """
-        user = user.model_dump(exclude_unset=True)
-        if not user:
-            raise HTTPException(
-                status_code = status.HTTP_400_BAD_REQUEST,
-                detail = "No fields to update"
-            )
 
         user_to_update = self.db.query(User).filter(User.id == user_id).first()
         if not user_to_update:
@@ -146,8 +135,5 @@ class UserRepository(IUserRepository):
         :param email: EmailStr
         :return: user | None
         """
-        user = self.db.query(User).filter(User.email == email).first()
-        if not user:
-            return None
 
-        return user
+        return self.db.query(User).filter(User.email == email).first()
