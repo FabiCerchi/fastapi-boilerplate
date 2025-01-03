@@ -70,7 +70,13 @@ async def get_users(
         :param current_user: TokenData
         :return: list[UserResponse]
     """
-    users = user_service.get_users()
+    try:
+        users = user_service.get_users()
+    except RepositoryError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
     return users
 
 @user_router.get(

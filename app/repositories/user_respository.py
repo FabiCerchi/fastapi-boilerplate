@@ -60,7 +60,10 @@ class UserRepository(IUserRepository):
         Method to get all users
         :return: List[User]
         """
-        users = self.db.query(User).all()
+        try:
+            users = self.db.query(User).all()
+        except Exception as e:
+            raise RepositoryError(f"Failed to get users: {e}")
         return users
 
     def add(self, user: UserCreate) -> User:
