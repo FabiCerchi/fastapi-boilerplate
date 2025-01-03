@@ -6,6 +6,7 @@ from abc import abstractmethod
 from fastapi import HTTPException, status
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from typing import Optional, Type
 
 from app.schemas.user import UserCreate, UserUpdate
@@ -155,4 +156,4 @@ class UserRepository(IUserRepository):
         :return: user | None
         """
 
-        return self.db.query(User).filter((User.username == username) | (User.email == email)).first()
+        return self.db.query(User).filter(or_(User.username == username, User.email == email)).first()
