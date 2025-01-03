@@ -11,7 +11,6 @@ from typing import Optional, Type
 from app.schemas.user import UserCreate, UserUpdate
 from app.repositories.base_repository import IRepository
 from app.models.user import User
-from app.utils.hashing import Hasher
 
 
 class IUserRepository(IRepository):
@@ -24,6 +23,16 @@ class IUserRepository(IRepository):
         """
         Method to get user by email
         :param email: EmailStr
+        :return: user | None
+        """
+        pass
+
+    @abstractmethod
+    def get_user_by_username_or_email(self, username: str, email: str) -> Optional[User]:
+        """
+        Method to get user by username or email
+        :param username: str
+        :param email: str
         :return: user | None
         """
         pass
@@ -62,7 +71,7 @@ class UserRepository(IUserRepository):
             new_user = User(
                 email=user.email,
                 username=user.username,
-                password=Hasher.get_password_hash(user.password),
+                password=user.password,
                 address= user.address,
             )
             self.db.add(new_user)
@@ -137,3 +146,13 @@ class UserRepository(IUserRepository):
         """
 
         return self.db.query(User).filter(User.email == email).first()
+
+    def get_user_by_username_or_email(self, username: str, email: str) -> Optional[User]:
+        """
+        Method to get user by username or email
+        :param username: str
+        :param email: str
+        :return: user | None
+        """
+
+        return self.db.query(User).filter((User.username == username) | (User.email == email)).first()

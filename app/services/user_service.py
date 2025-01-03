@@ -5,9 +5,10 @@ from typing import Optional
 
 from pydantic import EmailStr
 
-from app.core.exceptions import ItemIdNotFoundError, ItemEmailNotFoundError
+from app.core.exceptions import ItemNotFoundError, UserAlreadyExistsError
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
 from app.repositories.user_respository import IUserRepository
+from app.utils.hashing import Hasher
 
 
 class UserService:
@@ -27,10 +28,23 @@ class UserService:
         :param user: UserCreate
         :return: UserResponse
         """
-        # Check if user with email already exists
-        # Check if user with username already exists
-        new_user = self.user_repository.add(user)
-        return new_user
+
+        if not user.username or len(user.username) < 4:
+            raise ValueError("Username must be at least 4 characters")
+
+        if not user.password or len(user.password) < 8:
+            raise ValueError("Password must be at least 8 characters")
+
+        existing_user = self.get_user_by_username_or_email(user.username, user.email)
+        if existing_user:
+            if existing_user.email == user.email:
+                raise UserAlreadyExistsError('email', user.email)
+            elif existing_user.username == user.username:
+                raise UserAlreadyExistsError('username', user.username)
+
+        user.password = Hasher.get_password_hash(user.password)
+        created_user = self.user_repository.add(user)
+        return UserResponse.model_validate(created_user)
 
     def get_users(self) -> list[UserResponse]:
         """
@@ -49,7 +63,7 @@ class UserService:
         """
         user = self.user_repository.get(user_id)
         if user is None:
-            raise ItemIdNotFoundError('user', user_id)
+            raise ItemNotFoundError('user', user_id)
 
         return user
 
@@ -71,7 +85,7 @@ class UserService:
         """
         exist  = self.user_repository.get(user_id)
         if not exist:
-            raise ItemIdNotFoundError('user', user_id)
+            raise ItemNotFoundError('user', user_id)
 
         try:
             updated_user = self.user_repository.update(user_id, user)
@@ -88,5 +102,16 @@ class UserService:
         """
         user = self.user_repository.get_user_by_email(email)
         if not user:
-            raise ItemEmailNotFoundError('user', email)
+            raise ItemNotFoundError('user', email)
+        return user
+
+    def get_user_by_username_or_email(self, username: str, email: str) -> Optional[UserResponse]:
+        """
+        Method to get user by username or email
+        :param username: str
+        :param email: str
+        :return: UserResponse
+        """
+        user = self.user_repository.get_user_by_username_or_email(username, email)
+
         return user

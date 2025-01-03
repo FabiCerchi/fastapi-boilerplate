@@ -1,12 +1,13 @@
 """
 User endpoints
 """
+from multiprocessing.managers import Value
 from typing import Optional
 
 from fastapi import APIRouter, Depends, status, HTTPException
 from pydantic import EmailStr
 
-from app.core.exceptions import ItemIdNotFoundError, ItemEmailNotFoundError
+from app.core.exceptions import *
 from app.schemas.token import TokenData
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
 from app.services.user_service import UserService
@@ -33,7 +34,19 @@ async def create_user(
         :param current_user: TokenData
         :return: UserResponse
     """
-    new_user = user_service.create_user(user)
+    try:
+        new_user = user_service.create_user(user)
+    except UserAlreadyExistsError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e)
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
     return new_user
 
 @user_router.get(
@@ -75,7 +88,7 @@ async def get_user_by_id(
     """
     try:
         user = user_service.get_user_by_id(user_id)
-    except ItemIdNotFoundError as e:
+    except ItemNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
@@ -131,7 +144,7 @@ async def update_user(
 
     try:
         updated_user = user_service.update_user(user_id, user)
-    except ItemIdNotFoundError as e:
+    except ItemNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
@@ -165,7 +178,7 @@ async def get_user_by_email(
 
     try:
         user = user_service.get_user_by_email(email)
-    except ItemEmailNotFoundError as e:
+    except ItemNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
