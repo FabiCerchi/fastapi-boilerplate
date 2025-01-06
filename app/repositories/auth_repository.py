@@ -9,6 +9,8 @@ from app.models.user import User
 from app.utils.hashing import Hasher
 from app.utils.token import Token
 from app.schemas.token import TokenResponse
+
+
 class AuthRepository:
     """
     Auth repository class

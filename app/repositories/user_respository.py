@@ -2,8 +2,7 @@
 This module contains the user repository class and interface
 """
 
-from abc import abstractmethod, ABC
-from fastapi import HTTPException, status
+from abc import abstractmethod
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -15,7 +14,7 @@ from app.repositories.base_repository import IRepository
 from app.models.user import User
 
 
-class IUserRepository(IRepository, ABC):
+class IUserRepository(IRepository):
     """
     User repository interface
     """

@@ -1,12 +1,10 @@
 """
 User endpoints
 """
-from multiprocessing.managers import Value
 from typing import Optional
 
 from fastapi import APIRouter, Depends, status, HTTPException
 from pydantic import EmailStr
-from sqlalchemy.orm import Query
 
 from app.core.exceptions import *
 from app.schemas.pagination import PaginationParams
