@@ -70,7 +70,7 @@ fastapi-boilerplate/
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tu_usuario/tu_repositorio.git](https://github.com/FabiCerchi/fastapi-boilerplate
+   git clone https://github.com/FabiCerchi/fastapi-boilerplate
    cd fastapi-boilerplate
    ```
 2. Inicializa tu entorno virtual e instala los requerimientos
