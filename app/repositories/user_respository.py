@@ -113,21 +113,12 @@ class UserRepository(IUserRepository):
         """
 
         user_to_delete = self.db.query(User).filter(User.id == user_id).first()
-        if not user_to_delete:
-            raise HTTPException(
-                status_code = status.HTTP_404_NOT_FOUND,
-                detail = f"User with id {user_id} not found"
-            )
         try:
             self.db.delete(user_to_delete)
             self.db.commit()
         except Exception as e:
             self.db.rollback()
-            raise HTTPException(
-                status_code = status.HTTP_409_CONFLICT,
-                detail = f"Failed to delete user: {e}"
-            )
-
+            raise RepositoryError(f"Failed to delete user: {e}")
         return True
 
     def get_user_by_email(self, email: EmailStr) -> Optional[User]:

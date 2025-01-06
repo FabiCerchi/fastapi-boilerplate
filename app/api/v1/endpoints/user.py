@@ -123,7 +123,23 @@ async def delete_user(
         :param current_user:
         :return: bool
     """
-    return user_service.delete_user(user_id)
+
+    # Check si el user que se quiere eliminar es el mismo que el que está logueado
+    if current_user.id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only delete your own user"
+        )
+
+    try:
+        response = user_service.delete_user(user_id)
+    except RepositoryError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+    return response
 
 @user_router.put(
     "/{user_id}",
