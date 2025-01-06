@@ -8,7 +8,7 @@ from app.schemas.auth import Login
 from app.models.user import User
 from app.utils.hashing import Hasher
 from app.utils.token import Token
-
+from app.schemas.token import TokenResponse
 class AuthRepository:
     """
     Auth repository class
@@ -16,7 +16,7 @@ class AuthRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def auth_user(self, login: Login) -> dict[str, str]:
+    def auth_user(self, login: Login) -> TokenResponse:
         user = self.db.query(User).filter(User.username == login.username).first()
 
         if not user:
@@ -33,7 +33,7 @@ class AuthRepository:
 
         try:
             token = Token.generate_token(
-                data = {"sub": user.username}
+                data = {"sub": user.username, "id": user.id}
             )
         except Exception as e:
             raise HTTPException(
@@ -41,4 +41,5 @@ class AuthRepository:
                 detail=f"Failed to generate token: {e}"
             )
 
-        return {"access_token": token, "token_type": "bearer"}
+        token = TokenResponse(access_token=token, token_type="bearer")
+        return token
