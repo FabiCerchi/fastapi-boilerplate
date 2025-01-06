@@ -77,14 +77,20 @@ class UserService:
         :param user: UserUpdate
         :return: UserResponse
         """
-        exist  = self.user_repository.get(user_id)
-        if not exist:
-            raise ItemNotFoundError('user', user_id)
 
-        try:
-            updated_user = self.user_repository.update(user_id, user)
-        except Exception as e:
-            raise Exception(f"Failed to update user: {e}")
+        user_by_username = self.get_user_by_username_or_email(user.username, '')
+        user_by_mail = self.get_user_by_username_or_email('', user.email)
+
+        # Chequeamos si el usuario ya existe y no es el que esta actualizando
+        if user_by_username and user_by_username.id != user_id:
+            raise UserAlreadyExistsError('username', user.username)
+        elif user_by_mail and user_by_mail.id != user_id:
+            raise UserAlreadyExistsError('email', user.email)
+
+        if user.password:
+            user.password = Hasher.get_password_hash(user.password)
+
+        updated_user = self.user_repository.update(user_id, user)
 
         return updated_user
 
