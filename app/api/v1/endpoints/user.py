@@ -6,10 +6,12 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, status, HTTPException
 from pydantic import EmailStr
+from sqlalchemy.orm import Query
 
 from app.core.exceptions import *
+from app.schemas.pagination import PaginationParams
 from app.schemas.token import TokenData
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.user import UserCreate, UserResponse, UserUpdate, UserPaginatedResponse
 from app.services.user_service import UserService
 from app.api.dependencies import get_user_service
 from app.api.dependencies import get_current_user
@@ -57,27 +59,41 @@ async def create_user(
 @user_router.get(
     "/",
     status_code=status.HTTP_200_OK,
-    response_model=list[UserResponse],
+    response_model=UserPaginatedResponse,
     response_description="List of users"
 )
 async def get_users(
+        pagination: PaginationParams = Depends(),
         user_service: UserService = Depends(get_user_service),
         current_user: TokenData = Depends(get_current_user),
 ):
     """
     Get a list of users
+        :param pagination:
         :param user_service: UserService
         :param current_user: TokenData
         :return: list[UserResponse]
     """
+    limit = pagination.limit
+    offset = pagination.offset
     try:
-        users = user_service.get_users()
+        users, count = user_service.get_users(limit, offset)
+        metadata = {
+            "total_count": count,
+            "limit": limit,
+            "offset": offset,
+            "current_page": (offset // limit) + 1,
+            "total_pages": (count // limit) + (1 if count % limit > 0 else 0),
+        }
     except RepositoryError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
-    return users
+
+    users_response = UserPaginatedResponse(metadata=metadata, data=users)
+
+    return users_response
 
 @user_router.get(
     "/{user_id}",

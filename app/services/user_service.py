@@ -40,14 +40,15 @@ class UserService:
         created_user = self.user_repository.add(user)
         return UserResponse.model_validate(created_user)
 
-    def get_users(self) -> list[UserResponse]:
+    def get_users(self, limit: int, offset: int) -> tuple[list[UserResponse], int]:
         """
         Method to get all users
         :return: list[UserResponse]
         """
         # Check if exist users
-        users = self.user_repository.get_all()
-        return users
+        users = self.user_repository.get_all(limit, offset)
+        count = self.user_repository.count()
+        return users, count
 
     def get_user_by_id(self, user_id: int) -> UserResponse:
         """

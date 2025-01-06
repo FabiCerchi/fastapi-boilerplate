@@ -18,7 +18,7 @@ class IRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all(self):
+    def get_all(self, limit: int, offset: int):
         """
         Method to get all entities
         :return: List[Entity]

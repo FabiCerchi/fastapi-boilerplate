@@ -2,7 +2,7 @@
 This module contains the user repository class and interface
 """
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from fastapi import HTTPException, status
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
@@ -15,7 +15,7 @@ from app.repositories.base_repository import IRepository
 from app.models.user import User
 
 
-class IUserRepository(IRepository):
+class IUserRepository(IRepository, ABC):
     """
     User repository interface
     """
@@ -39,6 +39,13 @@ class IUserRepository(IRepository):
         """
         pass
 
+    @abstractmethod
+    def count(self) -> int:
+        """
+        Method to count entities
+        :return: int
+        """
+        pass
 
 class UserRepository(IUserRepository):
     """
@@ -55,16 +62,23 @@ class UserRepository(IUserRepository):
         """
         return self.db.query(User).filter(User.id == user_id).first()
 
-    def get_all(self) -> list[Type[User]]:
+    def get_all(self, limit: int, offset: int) -> list[Type[User]]:
         """
         Method to get all users
         :return: List[User]
         """
         try:
-            users = self.db.query(User).all()
+            users = self.db.query(User).offset(offset).limit(limit).all()
         except Exception as e:
             raise RepositoryError(f"Failed to get users: {e}")
         return users
+
+    def count(self) -> int:
+        """
+        Method to count users
+        :return: int
+        """
+        return self.db.query(User).count()
 
     def add(self, user: UserCreate) -> User:
         """

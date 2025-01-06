@@ -23,7 +23,7 @@ class TestUserAPI:
     def test_get_users(self, auth_token, test_client):
         get_users_response = test_client.get("/users/", headers={"Authorization": f"Bearer {auth_token}"})
         assert get_users_response.status_code == 200, f"Error: {get_users_response.json()}"
-        assert isinstance(get_users_response.json(), list)
+        assert isinstance(get_users_response.json()['data'], list)
 
 
     def test_get_user_by_id(self, test_client):
