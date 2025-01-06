@@ -96,23 +96,13 @@ class UserRepository(IUserRepository):
         """
 
         user_to_update = self.db.query(User).filter(User.id == user_id).first()
-        if not user_to_update:
-            raise HTTPException(
-                status_code = status.HTTP_404_NOT_FOUND,
-                detail = f"User with id {user_id} not found"
-            )
-
         try:
-            for key, value in user.items():
+            for key, value in user.model_dump(exclude_unset=True).items():
                 setattr(user_to_update, key, value)
             self.db.commit()
-            self.db.refresh(user_to_update)
         except Exception as e:
             self.db.rollback()
-            raise HTTPException(
-                status_code = status.HTTP_409_CONFLICT,
-                detail = f"Failed to update user: {e}"
-            )
+            raise RepositoryError(f'Failed to update user: {e}')
         return user_to_update
 
     def delete(self, user_id: int) -> bool:

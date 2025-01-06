@@ -145,12 +145,12 @@ async def update_user(
         :param current_user: TokenData
         :return: UserResponse
     """
-    user: dict[str, any] = user.model_dump(exclude_unset=True)
 
-    if not user:
+    # Check si el user que se quiere actualizar es el mismo que el que está logueado
+    if current_user.id != user_id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No fields to update"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only update your own user"
         )
 
     try:
@@ -160,9 +160,14 @@ async def update_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e)
         )
-    except Exception as e:
+    except UserAlreadyExistsError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
+            detail=str(e)
+        )
+    except RepositoryError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
 
