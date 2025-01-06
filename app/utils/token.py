@@ -4,7 +4,6 @@ Token utility
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 
-
 from app.core.config import settings
 from app.schemas.token import TokenData
 
@@ -29,7 +28,7 @@ class Token:
         return encoded_jwt
 
     @staticmethod
-    def verify_token(token: str, credentials_exception) -> dict:
+    def verify_token(token: str, credentials_exception) -> TokenData:
         """
         Verify token
         :param token: {str} token to verify
@@ -39,9 +38,10 @@ class Token:
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             username = payload.get("sub")
+            id = payload.get("id")
             if username is None:
                 raise credentials_exception
-            token_data = TokenData(username=username)
+            token_data = TokenData(username=username, id=id)
         except JWTError:
             raise credentials_exception
 
