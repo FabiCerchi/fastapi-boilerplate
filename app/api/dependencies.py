@@ -26,9 +26,8 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     Función que inyecta la dependencia para los endpoints.
     """
     try:
-        # Decodificar el token y obtener datos del usuario actual
+        # Decodificar el token y obtener datos del token
         current_user: TokenData = oauth_service.get_current_user(token)
-
         # Validar que los datos básicos del usuario existen en el token
         if not current_user.id or not current_user.username:
             raise HTTPException(
@@ -45,7 +44,12 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
                 detail="User not found",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-
+        if not current_user.active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Inactive user",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         return current_user
 
     except Exception as e:
@@ -54,7 +58,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
         )
-
 
 def get_user_service(db: Session = Depends(get_db)) -> UserService:
     """

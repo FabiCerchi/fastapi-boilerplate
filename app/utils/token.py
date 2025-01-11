@@ -38,11 +38,12 @@ class Token:
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             username = payload.get("sub")
-            id = payload.get("id")
+            user_id = payload.get("id")
+            is_superuser = payload.get("is_superuser")
+            active = payload.get("active")
             if username is None:
                 raise credentials_exception
-            token_data = TokenData(username=username, id=id)
+            token_data = TokenData(username=username, id=user_id, is_superuser=is_superuser, active=active)
         except JWTError:
             raise credentials_exception
-
         return token_data
