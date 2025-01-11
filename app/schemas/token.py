@@ -4,6 +4,8 @@ from pydantic import BaseModel
 class TokenData(BaseModel):
     username: str = None
     id: int = None
+    is_superuser: bool
+    active: bool
 
 class TokenResponse(BaseModel):
     access_token: str

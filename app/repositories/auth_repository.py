@@ -35,7 +35,7 @@ class AuthRepository:
 
         try:
             token = Token.generate_token(
-                data = {"sub": user.username, "id": user.id}
+                data = {"sub": user.username, "id": user.id, "is_superuser": user.is_superuser, "active": user.active}
             )
         except Exception as e:
             raise HTTPException(
