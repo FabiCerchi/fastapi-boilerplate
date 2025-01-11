@@ -17,7 +17,7 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     id: int
     username: str
-    email: EmailStr
+    email: str
     address: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
