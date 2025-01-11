@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
 
 from app.db.database import Base
 
@@ -14,3 +14,5 @@ class User(Base):
     address = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    is_superuser = Column(Boolean, default=False)
+    active = Column(Boolean, default=True)
