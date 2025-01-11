@@ -5,37 +5,37 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-
-env_path = Path('.') / '.env'
+env_path = Path('.') / '.env.test'
+print(f'Loading environment variables from: {env_path}')
 load_dotenv(dotenv_path=env_path)
 
 class Settings:
     """
     Settings for the application
     """
-    POSTGRES_USER: str = os.getenv('POSTGRES_USER')
-    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
-    POSTGRES_DB: str = os.getenv('POSTGRES_DB')
-    POSTGRES_HOST: str = os.getenv('POSTGRES_HOST')
-    POSTGRES_PORT: int = os.getenv('POSTGRES_PORT')
+    DB = os.getenv('DB')
+    DB_USER: str = os.getenv('DB_USER')
+    DB_PASSWORD: str = os.getenv('DB_PASSWORD')
+    DB_NAME: str = os.getenv('DB_NAME')
+    DB_HOST: str = os.getenv('DB_HOST')
+    DB_PORT: int = os.getenv('DB_PORT')
     SQLALCHEMY_DATABASE_URI: str = (
-        f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@'
-        f'{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
+        f'{DB}://{DB_USER}:{DB_PASSWORD}@'
+        f'{DB_HOST}:{DB_PORT}/{DB_NAME}'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SECRET_KEY: str = os.getenv('SECRET_KEY')
     ALGORITHM: str = os.getenv('ALGORITHM')
-
     def __str__(self):
         return (
-            f'POSTGRES_USER: {self.POSTGRES_USER}\n'
-            f'POSTGRES_PASSWORD: {self.POSTGRES_PASSWORD}\n'
-            f'POSTGRES_DB: {self.POSTGRES_DB}\n'
-            f'POSTGRES_HOST: {self.POSTGRES_HOST}\n'
-            f'POSTGRES_PORT: {self.POSTGRES_PORT}\n'
+            f'DB: {self.DB}\n'
+            f'DB_USER: {self.DB_USER}\n'
+            f'DB_PASSWORD: {self.DB_PASSWORD}\n'
+            f'DB_NAME: {self.DB_NAME}\n'
+            f'DB_HOST: {self.DB_HOST}\n'
+            f'DB_PORT: {self.DB_PORT}\n'
             f'SQLALCHEMY_DATABASE_URI: {self.SQLALCHEMY_DATABASE_URI}\n'
             f'SQLALCHEMY_TRACK_MODIFICATIONS: {self.SQLALCHEMY_TRACK_MODIFICATIONS}\n'
         )
 
 settings = Settings()
-print(settings)
